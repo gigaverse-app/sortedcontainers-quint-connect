@@ -107,6 +107,7 @@ Features
 - Benchmark comparison (alternatives, runtimes, load-factors)
 - 100% test coverage
 - Hours of stress testing
+- Model-based `Quint contracts`_ replayed against the code in CI
 - Performance matters (often faster than C implementations)
 - Compatible API (nearly identical to older blist and bintrees modules)
 - Feature-rich (e.g. get the five largest keys in a sorted dict: d.keys()[-5:])
@@ -114,6 +115,8 @@ Features
 - Developed on Python 3.10
 - Tested with CPython 3.7, 3.8, 3.9, 3.10, 3.11, 3.12 and PyPy3
 - Tested on Linux, Mac OSX, and Windows
+
+.. _`Quint contracts`: contracts/README.md
 
 .. image:: https://github.com/grantjenks/python-sortedcontainers/workflows/integration/badge.svg
    :target: http://www.grantjenks.com/docs/sortedcontainers/
