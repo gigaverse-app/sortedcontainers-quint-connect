@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "name": "sorted-list",
+  "description": "SortedList as a sorted multiset of integers: ordering, duplicates, removal of one copy, positional reads and pops with negative positions, and the IndexError/ValueError contract.",
+  "module": "sorted_list",
+  "model": "sorted_list.qnt",
+  "invariant": "contentsSorted",
+  "actions": {
+    "create": "SortedList(start), then _reset(2) so short histories split and merge sublists and use the positional index",
+    "add": "sl.add(value)",
+    "discard": "sl.discard(value)",
+    "remove": "sl.remove(value), observed as Missing when it raises ValueError",
+    "popAt": "sl.pop(position), observed as Returned(value) or OutOfRange when it raises IndexError",
+    "readAt": "sl[position], observed as Returned(value) or OutOfRange when it raises IndexError",
+    "inspect": "read list(sl) without changing it"
+  },
+  "witnesses": ["duplicatesStaySortedTest", "errorsChangeNothingTest", "readAfterAddTest", "readAfterDiscardTest"],
+  "mutants": [
+    {"name": "discard-removes-all", "description": "discard() deletes every copy of a duplicated value instead of one"},
+    {"name": "remove-missing-silent", "description": "remove() of an absent value returns quietly instead of raising ValueError"},
+    {"name": "stale-index-on-add", "description": "add() into a sublist that does not split forgets to update the positional index"},
+    {"name": "stale-index-on-delete", "description": "deleting from a sublist that does not merge forgets to update the positional index"}
+  ],
+  "bounds": {"seed": 7, "max_samples": 200, "max_steps": 10, "n_traces": 16},
+  "root": "../..",
+  "sources": ["src/sortedcontainers/sortedlist.py"],
+  "attest": {"package": "sortedcontainers", "source": "src"},
+  "limits": [
+    "Integers 0-3, positions -6 to 6, starting lists of at most 7 values, at most 10 steps per sampled history.",
+    "Load factor 2 (set with the documented _reset), not the default 1000; key functions (SortedKeyList), slicing, bisect, irange and update are not modeled.",
+    "Single-threaded; the driver's projection list(sl) is trusted."
+  ]
+}

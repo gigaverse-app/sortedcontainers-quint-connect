@@ -57,3 +57,45 @@ jobs:
 
       - name: Test with tox
         run: tox -e py
+
+  contracts:
+    name: Quint contracts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write  # the report's pull-request comment
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # pytest-quint-connect installs its pinned Quint with npm on first use.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # The plugin's Quint install, kept between runs; the plugin pin lives in tox.ini.
+      - uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/quint-cache
+          key: quint-${{ runner.os }}-${{ hashFiles('tox.ini') }}
+
+      - name: Install tox
+        run: |
+          pip install --upgrade pip
+          pip install tox
+
+      - name: Check the generated driver and replay the model's histories
+        env:
+          PYTEST_QUINT_CONNECT_CACHE: ${{ runner.temp }}/quint-cache
+        run: tox -e contracts
+
+      # Same version as pytest-quint-connect in tox.ini; bump both together.
+      - uses: gigaverse-app/pytest-quint-connect/report@v1.2.1
+        if: ${{ !cancelled() }}
+        with:
+          readme: contracts/README.md
